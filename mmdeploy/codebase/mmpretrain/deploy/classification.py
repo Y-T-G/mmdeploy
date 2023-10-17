@@ -55,6 +55,10 @@ def process_model_config(model_cfg: Config,
     cfg = model_cfg.deepcopy()
     if not isinstance(imgs, (list, tuple)):
         imgs = [imgs]
+    
+    if not isinstance(cfg.test_pipeline[0]['type'], str):
+        cfg.test_pipeline[0]['type'] = cfg.test_pipeline[0]['type'].__name__
+
     if isinstance(imgs[0], str):
         if cfg.test_pipeline[0]['type'] != 'LoadImageFromFile':
             cfg.test_pipeline.insert(0, dict(type='LoadImageFromFile'))
@@ -64,6 +68,8 @@ def process_model_config(model_cfg: Config,
     # check whether input_shape is valid
     if input_shape is not None:
         for pipeline_component in cfg.test_pipeline:
+            if not isinstance(pipeline_component['type'], str):
+                pipeline_component['type'] = pipeline_component['type'].__name__
             if 'Crop' in pipeline_component['type']:
                 if 'crop_size' in pipeline_component:
                     crop_size = pipeline_component['crop_size']
